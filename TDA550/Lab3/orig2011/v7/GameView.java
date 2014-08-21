@@ -14,7 +14,6 @@ import javax.swing.JComponent;
  * A view Component suitable for inclusion in an AWT Frame. Paints itself by
  * consulting its model.
  */
-@SuppressWarnings("serial")
 public class GameView extends JComponent implements PropertyChangeListener {
 
 	/** Size of game model */
@@ -37,7 +36,6 @@ public class GameView extends JComponent implements PropertyChangeListener {
 	 */
 	public GameView() {
 		this(40);
-		System.out.println("Did construct GameView");
 	}
 
 	/**
@@ -47,24 +45,25 @@ public class GameView extends JComponent implements PropertyChangeListener {
 	 *            side length in pixels of each GameObject.
 	 */
 	public GameView(final int tileSide) {
-		this.setModel(this.model);
 		this.tileSize = new Dimension(tileSide, tileSide);
 		this.modelSize = Constants.getGameSize();
 		Dimension preferredSize =
 				new Dimension(this.modelSize.width * tileSide,
 						this.modelSize.height * tileSide);
-		setPreferredSize(preferredSize);		
+		setPreferredSize(preferredSize);
 	}
-	
-	/**Updates the view with a new model.*/
+
+	/**
+	 * Updates the view with a new model.
+	 */
 	public void setModel(final GameModel model) {
-		if(this.model != null)
-			this.model.removeObserver(this);
 		this.model = model;
-		if(model != null)
+		
+		if (model != null) {
 			this.model.addObserver(this);
+		}
+
 		repaint();
-		System.out.println("Chosen Model:" + this.getClass().toString());
 	}
 
 	/**
@@ -113,18 +112,13 @@ public class GameView extends JComponent implements PropertyChangeListener {
 		} else {
 			g.setFont(new Font("Sans", Font.BOLD, 24));
 			g.setColor(Color.BLACK);
-			final char[] message = "Choose your desired game".toCharArray(); 
+			final char[] message = "No model chosen.".toCharArray(); 
 			g.drawChars(message, 0, message.length, 50, 50);
 		}
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent ev) {
-		// TODO When a property is changed do this
-		if(ev.getSource() instanceof GameModel){
-			this.repaint();
-			System.out.println("PropChange in GameView");
-		}
-		
+	public void propertyChange(PropertyChangeEvent evt) {
+		this.repaint();
 	}
 }

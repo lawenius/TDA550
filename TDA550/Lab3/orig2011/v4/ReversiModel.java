@@ -79,10 +79,12 @@ public class ReversiModel implements GameModel {
 	private final int width;
 	private final int height;
 	private boolean gameOver;
-	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-
+	
+	private final PropertyChangeSupport propertyChangeSupport;
 
 	public ReversiModel(){
+		
+		this.propertyChangeSupport = new PropertyChangeSupport(this);
 
 		this.width = GameUtils.getGameboardSize().width;
 		this.height = GameUtils.getGameboardSize().height;
@@ -94,9 +96,6 @@ public class ReversiModel implements GameModel {
 				this.board[i][j] = PieceColor.EMPTY;
 			}
 		}
-		
-		
-
 
 		this.turn = Turn.BLACK;
 
@@ -108,6 +107,7 @@ public class ReversiModel implements GameModel {
 		this.board[midX + 1][midY] = PieceColor.BLACK;
 		this.board[midX][midY + 1] = PieceColor.BLACK;
 
+		
 		// Set the initial score.
 		this.whiteScore = 2;
 		this.blackScore = 2;
@@ -117,8 +117,6 @@ public class ReversiModel implements GameModel {
 		// Insert the collector in the middle of the gameboard.
 		this.cursorPos = new Position(midX, midY);
 		updateCursor();
-		//TODO Update the View with the clean board
-		pcs.firePropertyChange("Update the View with the clean board", this, this.board);
 	}
 
 	/**
@@ -180,6 +178,7 @@ public class ReversiModel implements GameModel {
 				this.turn = Turn.nextTurn(this.turn);
 			}
 		}
+
 	}
 
 	private void turnOver(final Turn turn, final Position cursorPos) {
@@ -348,6 +347,8 @@ public class ReversiModel implements GameModel {
 		return null;
 
 	}
+	
+	
 
 	/**
 	 * This method is called repeatedly so that the
@@ -372,8 +373,6 @@ public class ReversiModel implements GameModel {
 			removeCursor(this.cursorPos);
 			this.cursorPos = nextCursorPos;
 			updateCursor();
-			//TODO Update the View with the clean board
-			pcs.firePropertyChange("Update the View with the new board state", this, this.board);
 		} else {
 			throw new GameOverException(this.blackScore - this.whiteScore);
 		}
@@ -403,19 +402,14 @@ public class ReversiModel implements GameModel {
 				t =	new CompositeTile(t, cursorRedTile);
 		}
 	}
-	
+
 	@Override
 	public void addObserver(PropertyChangeListener observer) {
-		// PropertyChangeSupport variable with this instance is named: pcs
-		pcs.addPropertyChangeListener(observer);
-		
+		this.propertyChangeSupport.addPropertyChangeListener(observer);
 	}
 
 	@Override
 	public void removeObserver(PropertyChangeListener observer) {
-		// Delete given observer
-		pcs.removePropertyChangeListener(observer);
-		
+		this.propertyChangeSupport.removePropertyChangeListener(observer);
 	}
-
 }

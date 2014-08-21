@@ -1,7 +1,6 @@
 package orig2011.v5;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -37,8 +36,6 @@ public class GameView extends JComponent implements PropertyChangeListener {
 	 */
 	public GameView() {
 		this(40);
-		this.setModel(this.model);
-		System.out.println("Did construct GameView");
 	}
 
 	/**
@@ -54,22 +51,14 @@ public class GameView extends JComponent implements PropertyChangeListener {
 				new Dimension(this.modelSize.width * tileSide,
 						this.modelSize.height * tileSide);
 		setPreferredSize(preferredSize);
-		
 	}
-	
-	
 
 	/**
 	 * Updates the view with a new model.
 	 */
 	public void setModel(final GameModel model) {
-		if(this.model != null)
-			this.model.removeObserver(this);
 		this.model = model;
-		if(model != null)
-			this.model.addObserver(this);
 		repaint();
-		System.out.println("Did setModel");
 	}
 
 	/**
@@ -124,12 +113,7 @@ public class GameView extends JComponent implements PropertyChangeListener {
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent ev) {
-		// TODO When a property is changed do this
-		if(ev.getSource() instanceof GameModel){
-			repaint();
-			System.out.println("PropChange in GameView");
-		}
-		
+	public void propertyChange(PropertyChangeEvent evt) {
+		this.repaint();
 	}
 }

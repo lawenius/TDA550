@@ -19,6 +19,9 @@ import java.util.List;
  * collector leaves game board.
  */
 public class GoldModel implements GameModel {
+	
+	private static final int UPDATE_SPEED = 150;
+	
 	public enum Directions {
 		EAST(1, 0),
 		WEST(-1, 0),
@@ -55,14 +58,19 @@ public class GoldModel implements GameModel {
 	 */
 
 	/** Graphical representation of a coin. */
-	private static final GameTile COIN_TILE = new RoundTile(new Color(255, 215,0),new Color(255, 255, 0), 2.0);
+	private static final GameTile COIN_TILE = new RoundTile(new Color(255, 215,
+			0),
+			new Color(255, 255, 0), 2.0);
+
 	/** Graphical representation of the collector */
-	private static final GameTile COLLECTOR_TILE = new RoundTile(Color.BLACK,Color.RED, 2.0);
+	private static final GameTile COLLECTOR_TILE = new RoundTile(Color.BLACK,
+			Color.RED, 2.0);
+
 	/** Graphical representation of a blank tile. */
 	private static final GameTile BLANK_TILE = new BlankTile();
+
 	/** A list containing the positions of all coins. */
 	private final List<Position> coins = new ArrayList<Position>();
-
 	/*
 	 * The declaration and object creation above uses the new language feature
 	 * 'generic types'. It can be declared in the old way like this:
@@ -74,22 +82,28 @@ public class GoldModel implements GameModel {
 
 	/** The game board */
 	private final GameTile[][] gameboardState;
+	
 	/** The position of the collector. */
 	private Position collectorPos;
+
 	/** The direction of the collector. */
 	private Directions direction = Directions.NORTH;
+
 	/** The number of coins found. */
 	private int score;
-	/** The observer variable*/
-	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-
+	
+	/** IObservable helper **/
+	private final PropertyChangeSupport propertyChangeSupport;
+	
 	/**
 	 * Create a new model for the gold game.
 	 */
 	public GoldModel() {
+		this.propertyChangeSupport = new PropertyChangeSupport(this);
+
 		Dimension size = GameUtils.getGameboardSize();
 		this.gameboardState = new GameTile[size.width][size.height];
-		
+
 		// Blank out the whole gameboard
 		for (int i = 0; i < size.width; i++) {
 			for (int j = 0; j < size.height; j++) {
@@ -105,8 +119,7 @@ public class GoldModel implements GameModel {
 		for (int i = 0; i < COIN_START_AMOUNT; i++) {
 			addCoin();
 		}
-		//TODO Update the View with the clean board
-		pcs.firePropertyChange("Update the View with the clean board", this, this.gameboardState);
+		
 	}
 
 	/**
@@ -209,9 +222,8 @@ public class GoldModel implements GameModel {
 
 		// Add a new coin (simulating moving one coin)
 		addCoin();
-		//TODO Update the View with the clean board
-		pcs.firePropertyChange("Update the View with the clean board", this, this.gameboardState);
 
+		this.propertyChangeSupport.firePropertyChange("update", null, null);
 	}
 
 	/**
@@ -227,28 +239,23 @@ public class GoldModel implements GameModel {
 	public GameTile getGameboardState(Position pos) {
 		return getGameboardState(pos.getX(), pos.getY());
 	}
-
+	
 	public GameTile getGameboardState(int x, int y) {
 		return gameboardState[x][y];
 	}
-	
+
 	@Override
 	public void addObserver(PropertyChangeListener observer) {
-		// PropertyChangeSupport variable with this instance is named: pcs
-		pcs.addPropertyChangeListener(observer);
-		
+		this.propertyChangeSupport.addPropertyChangeListener(observer);
 	}
 
 	@Override
 	public void removeObserver(PropertyChangeListener observer) {
-		// Delete given observer
-		pcs.removePropertyChangeListener(observer);
-		
+		this.propertyChangeSupport.removePropertyChangeListener(observer);
 	}
 
 	@Override
 	public int getUpdateSpeed() {
-		return 150;
+		return UPDATE_SPEED;
 	}
-
 }

@@ -90,7 +90,6 @@ public class GUIView extends JPanel {
 	 * the game controller.
 	 */
 	private class StartGameListener implements ActionListener {
-		@SuppressWarnings("synthetic-access")
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			Object source = e.getSource();

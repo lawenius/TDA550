@@ -15,13 +15,11 @@ import javax.swing.JPanel;
  * a gui for choosing a new game. The list of games will be aquired from
  * a GameFactory.
  */
-@SuppressWarnings("serial")
 public class GUIView extends JPanel {
 	/** The "Start Game" button */
 	private final JButton startGameButton;
 
 	/** The chooser (also called drop-down menu) with names of different games */
-	@SuppressWarnings("rawtypes")
 	private final JComboBox gameChooser;
 
 	/** The game controller associated with the GameView */
@@ -40,13 +38,15 @@ public class GUIView extends JPanel {
 	 * Create a new GUIView. This will create a GameView and a GameController.
 	 * @param factory The factory to use for creating games.
 	 */
-	@SuppressWarnings({ "synthetic-access", "rawtypes", "unchecked" })
+	@SuppressWarnings("synthetic-access")
 	public GUIView(IGameFactory factory) {
 		// Create a new GameView
 		this.gameView = new GameView();
 
 		// Create a new GameController connected to the GameView
-		this.gameController = new GameController(this.gameView);
+		this.gameController = new GameController();
+		
+		this.gameView.addKeyListener(this.gameController);
 
 		// Create a new GameFactory
 		this.gameFactory = factory;
@@ -92,7 +92,6 @@ public class GUIView extends JPanel {
 	 * the game controller.
 	 */
 	private class StartGameListener implements ActionListener {
-		@SuppressWarnings("synthetic-access")
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			Object source = e.getSource();
@@ -103,12 +102,13 @@ public class GUIView extends JPanel {
 						GUIView.this.gameChooser.getSelectedItem().toString();
 				GameModel gameModel =
 						GUIView.this.gameFactory.createGame(gameName);
-				
-				gameView.setModel(gameModel); //TODO NY
 
 				// Stop current game (if any) and start a new game with the
 				// new game model
+				GUIView.this.gameView.setModel(null);
 				GUIView.this.gameController.stopGame();
+				
+				GUIView.this.gameView.setModel(gameModel);
 				GUIView.this.gameController.startGame(gameModel);
 				GUIView.this.gameView.requestFocus();
 			}

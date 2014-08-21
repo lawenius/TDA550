@@ -6,14 +6,14 @@ public class Comments {
 //	Comments:
 //		----------
 //
-//		- Ni behöver inte göra GameUtils abstrakt och ni ska inte ärva den. Den ska istället användas 
-//		direkt genom att bara skriva typ GameUtils.setGameboardState(...). Eftersom metoderna är abstrakta 
-//		behöver ni inte instansiera något objekt.
+//		- Ni behï¿½ver inte gï¿½ra GameUtils abstrakt och ni ska inte ï¿½rva den. Den ska istï¿½llet anvï¿½ndas 
+//		direkt genom att bara skriva typ GameUtils.setGameboardState(...). Eftersom metoderna ï¿½r abstrakta 
+//		behï¿½ver ni inte instansiera nï¿½got objekt.
 //
-//		-Lagring av spelläget skall göras i (och endast i) variablerna board, cursorPus och turn.
+//		-Lagring av spellï¿½get skall gï¿½ras i (och endast i) variablerna board, cursorPus och turn.
 //
 //
-//		Annars ser det ut som ni är på rätt väg. Glöm inte att be Christer om förlängd deadline om så behövs.
+//		Annars ser det ut som ni ï¿½r pï¿½ rï¿½tt vï¿½g. Glï¿½m inte att be Christer om fï¿½rlï¿½ngd deadline om sï¿½ behï¿½vs.
 //		----------
 //
 

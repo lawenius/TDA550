@@ -1,6 +1,5 @@
 package orig2011.v6;
 
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.LinkedList;
@@ -11,22 +10,13 @@ import java.util.List;
  * passes them on to the current game.
  * </ul>
  */
-public class GameController implements Runnable {
-
-	/** The view this controller is connected to. */
-	private final GameView view;
+public class GameController implements Runnable, KeyListener {
 
 	/** The game model describes the running game. */
 	private GameModel gameModel;
 
-//	/** The timeout interval between each update. (millis) */
-//	private final int updateInterval;
-
 	/** True when game is running. */
 	private boolean isRunning;
-
-	/** Listener for key events to the game. */
-	private final KeyListener keyListener;
 
 	/** A queue for all keypresses which so far haven't been processed */
 	private final List<Integer> keypresses;
@@ -45,35 +35,27 @@ public class GameController implements Runnable {
 	/**
 	 * Creats a new GameContoller associated with supplied view.
 	 */
-	public GameController(final GameView view) {
-		this.view = view;
+	public GameController() {
 		this.gameModel = null;
 		this.isRunning = false;
-//		this.updateInterval = 150;
 
 		this.keypresses = new LinkedList<Integer>();
 
 		this.gameThread = null;
-
-		// Create the key listener which will listen for gamekeys
-		this.keyListener = new KeyAdapter() {
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void keyPressed(final KeyEvent event) {
-				enqueueKeyPress(event.getKeyCode());
-			}
-		};
-
 	}
 
 	/**
 	 * Add a key press to the end of the queue
 	 */
 	private synchronized void enqueueKeyPress(final int key) {
-		this.keypresses.add(Integer.valueOf(key));
-		if(this.gameModel.getUpdateSpeed()<0){
-			this.isRunning = true;
-			this.run();
+		if (this.gameModel.getUpdateSpeed() > 0) {
+			this.keypresses.add(Integer.valueOf(key));
+		} else {	
+			try {
+				this.gameModel.gameUpdate(key);
+			} catch (GameOverException e) {
+				// No need to stop run-loop, it's not running
+			}
 		}
 	}
 
@@ -102,19 +84,14 @@ public class GameController implements Runnable {
 			throw new IllegalStateException("Game is already running");
 		}
 
-		// Start listening for key events
-		this.view.addKeyListener(this.keyListener);
-//
-//		// Tell the view what to paint...
-//		this.view.setModel(gameModel);
-
 		// Actually start the game
 		this.gameModel = gameModel;
-		this.isRunning = true;
 
 		// Create the new thread and start it...
-		this.gameThread = new Thread(this);
-		this.gameThread.start();
+		if (this.gameModel.getUpdateSpeed() > 0) {
+			this.gameThread = new Thread(this);
+			this.gameThread.start();			
+		}
 	}
 
 	/**
@@ -124,13 +101,6 @@ public class GameController implements Runnable {
 		// Setting isRunning to false will
 		// make the thread stop (see run())
 		this.isRunning = false;
-//
-//		// Unset the game model...
-//		this.view.setModel(null);
-
-		// Stop listening for events
-		this.view.removeKeyListener(this.keyListener);
-
 		// Make sure we wait until the thread has stopped...
 		if (this.gameThread != null) {
 			while (this.gameThread.isAlive()) {
@@ -149,18 +119,14 @@ public class GameController implements Runnable {
 	 */
 	@Override
 	public void run() {
+		this.isRunning = true;
 		while (this.isRunning) {
 			try{
 				// Tell model to update, send next key press.
 				// or 0 if no new keypress since last update.
 				this.gameModel.gameUpdate(nextKeyPress());
-//				this.view.repaint();
-				
-				if(this.gameModel.getUpdateSpeed()>=0){
-					Thread.sleep(this.gameModel.getUpdateSpeed());
-				}
-				else this.isRunning= false;
-				
+
+				Thread.sleep(this.gameModel.getUpdateSpeed());
 			} catch (GameOverException e) {
 				// we got a game over signal, time to exit...
 				// The current implementation ignores the game score
@@ -171,5 +137,20 @@ public class GameController implements Runnable {
 				this.isRunning = false;
 			}
 		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent event) {
+		enqueueKeyPress(event.getKeyCode());
+	}
+
+	@Override
+	public void keyReleased(KeyEvent event) {
+		// Ignore
+	}
+
+	@Override
+	public void keyTyped(KeyEvent event) {
+		// Ignore
 	}
 }
